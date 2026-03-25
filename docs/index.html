@@ -1,47 +1,648 @@
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dan Koe Content System - Demo</title>
+    <title>Dan Koe 内容创作系统 - 交互式演示</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
-        .hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 100px 20px; text-align: center; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f7fa;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
         .hero h1 { font-size: 3em; margin-bottom: 20px; }
-        .hero p { font-size: 1.3em; max-width: 600px; margin: 0 auto 30px; }
-        .btn { display: inline-block; background: #ff6b6b; color: white; padding: 15px 30px; text-decoration: none; border-radius: 30px; font-weight: bold; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 60px 20px; }
-        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin: 40px 0; }
-        .feature { background: #f8f9fa; padding: 30px; border-radius: 10px; }
-        .feature h3 { color: #667eea; margin-bottom: 15px; }
+        .hero p { font-size: 1.3em; opacity: 0.9; max-width: 600px; margin: 0 auto 30px; }
+        .cta-btn {
+            display: inline-block;
+            background: #ff6b6b;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        .cta-btn:hover { transform: translateY(-3px); }
+        
+        /* Interactive Workflow */
+        .workflow-section { padding: 80px 0; background: white; }
+        .workflow-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 50px; color: #667eea; }
+        
+        .step-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+        }
+        .step-tab {
+            padding: 12px 24px;
+            background: #e0e0e0;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .step-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        .step-tab:hover:not(.active) { background: #d0d0d0; }
+        
+        .step-content {
+            display: none;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+            animation: fadeIn 0.5s;
+        }
+        .step-content.active { display: block; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-content h3 { color: #667eea; font-size: 1.8em; margin-bottom: 20px; }
+        .step-content ul { margin-left: 20px; }
+        .step-content li { margin-bottom: 10px; }
+        
+        /* Template Preview */
+        .template-section { padding: 80px 0; background: #f5f7fa; }
+        .template-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 50px; }
+        
+        .template-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .template-tab {
+            padding: 15px 30px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .template-tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .template-preview {
+            display: none;
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        .template-preview.active { display: block; }
+        
+        /* Calculator */
+        .calculator-section { padding: 80px 0; background: white; }
+        .calculator-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 50px; }
+        
+        .calc-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #f8f9fa;
+            padding: 40px;
+            border-radius: 15px;
+        }
+        .calc-input {
+            margin-bottom: 20px;
+        }
+        .calc-input label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .calc-input input, .calc-input select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .calc-result {
+            background: #667eea;
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 30px;
+        }
+        .calc-result h3 { font-size: 2em; margin-bottom: 10px; }
+        
+        /* Example Project */
+        .example-section { padding: 80px 0; background: #f5f7fa; }
+        .example-section h2 { text-align: center; font-size: 2.5em; margin-bottom: 50px; }
+        
+        .example-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Footer */
+        footer {
+            background: #333;
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+        }
+        footer a { color: #667eea; }
     </style>
 </head>
 <body>
+    <!-- Hero -->
     <section class="hero">
-        <h1>Dan Koe Content System</h1>
-        <p>Transform one newsletter into a multi-platform content empire. The exact system used to create content for 500K+ followers.</p>
-        <a href="https://github.com/KevPH2026/dan-koe-content" class="btn">Get Started →</a>
+        <div class="container">
+            <h1>Dan Koe 内容创作系统</h1>
+            <p>将一篇 Newsletter 转化为多平台内容帝国。<br>每天 2 小时，创作一周内容。</p>
+            <a href="#workflow" class="cta-btn">开始体验 →</a>
+        </div>
     </section>
-    
-    <div class="container">
-        <div class="features">
-            <div class="feature">
-                <h3>🎯 2 Hours/Day</h3>
-                <p>Create an entire week's content in just 2 hours of focused work.</p>
-            </div>
-            <div class="feature">
-                <h3>📱 20+ Posts/Week</h3>
-                <p>One newsletter becomes 20+ pieces of content across all platforms.</p>
-            </div>
+
+    <!-- Interactive Workflow -->
+    <section class="workflow-section" id="workflow">
+        <div class="container">
+            <h2>🔄 7 步交互式工作流</h2>
             
-            
-            <div class="feature">
-                <h3>⚡ 7-Step Framework</h3>
-                <p>Proven system from inspiration to publication. No more guesswork.</p>
+            <div class="step-tabs">
+                <button class="step-tab active" onclick="showStep(1)">步骤 1</button>
+                <button class="step-tab" onclick="showStep(2)">步骤 2</button>
+                <button class="step-tab" onclick="showStep(3)">步骤 3</button>
+                <button class="step-tab" onclick="showStep(4)">步骤 4</button>
+                <button class="step-tab" onclick="showStep(5)">步骤 5</button>
+                <button class="step-tab" onclick="showStep(6)">步骤 6</button>
+                <button class="step-tab" onclick="showStep(7)">步骤 7</button>
+            </div>
+
+            <div class="step-content active" id="step-1">
+                <h3>🗂️ 项目设置 (10 分钟)</h3>
+                <p>创建专用项目文件夹，所有材料自动归档：</p>
+                <ul>
+                    <li><strong>01-inspiration/</strong> - 收集灵感素材</li>
+                    <li><strong>02-research/</strong> - 深度研究资料</li>
+                    <li><strong>03-outline/</strong> - 大纲框架</li>
+                    <li><strong>04-draft/</strong> - 写作草稿</li>
+                    <li><strong>05-assets/</strong> - 图片视频素材</li>
+                    <li><strong>06-social-posts/</strong> - 社交内容</li>
+                    <li><strong>07-published/</strong> - 已发布内容</li>
+                </ul>
+                <p><em>关键：所有内容在一个视图中管理，不再多标签混乱</em></p>
+            </div>
+
+            <div class="step-content" id="step-2">
+                <h3>💡 收集灵感 (20 分钟)</h3>
+                <p><strong>重要：先收集灵感，再写大纲！</strong></p>
+                <ul>
+                    <li>你之前写过的相关推文</li>
+                    <li>灵感库 (Swipe File) 中的优质内容</li>
+                    <li>相关的旧 Newsletter</li>
+                    <li>启发这次创作的视频或文章</li>
+                </ul>
+                <p><em>找到"火花" - 一个触发核心创意的比喻、概念或引用</em></p>
+            </div>
+
+            <div class="step-content" id="step-3">
+                <h3>🔬 深度研究 (30 分钟)</h3>
+                <p>添加多个 YouTube 视频、文章到项目中，然后用 AI 对话：</p>
+                <ul>
+                    <li>提问关于话题的问题</li>
+                    <li>挑战假设</li>
+                    <li>探索边缘案例</li>
+                    <li>所有知识在一个视图中管理</li>
+                </ul>
+                <p><em>示例问题："大多数人对 [话题] 有什么误解？"</em></p>
+            </div>
+
+            <div class="step-content" id="step-4">
+                <h3>📝 创建大纲 - 6 部框架</h3>
+                <p>Dan 每篇 Newsletter 都使用这个框架：</p>
+                <ol>
+                    <li><strong>受众</strong> - 我在为谁写？</li>
+                    <li><strong>争议真相</strong> - 什么极端观点我认为是对的？</li>
+                    <li><strong>痛点</strong> - 个人经历或观察到的问题</li>
+                    <li><strong>新颖视角</strong> - 独特的观点或框架</li>
+                    <li><strong>独特机制</strong> - 具体可行的步骤</li>
+                    <li><strong>核心要点</strong> - 读者看完后应该做什么？</li>
+                </ol>
+            </div>
+
+            <div class="step-content" id="step-5">
+                <h3>✍️ 写作 + 同时发布</h3>
+                <p>在写 Newsletter 的过程中：</p>
+                <ul>
+                    <li>随时记录社交媒体帖子的想法</li>
+                    <li>立即发布（不要等待）</li>
+                    <li>写作过程本身就在产出短文内容</li>
+                </ul>
+                <p><em>无需额外时间构思推文，写作过程本身就在产出</em></p>
+            </div>
+
+            <div class="step-content" id="step-6">
+                <h3>🤖 AI 生成标题和视频素材</h3>
+                <p>Newsletter 写完后，让 AI 帮你：</p>
+                <ul>
+                    <li>生成 10 个 YouTube 标题想法</li>
+                    <li>建议视频 B-roll（需要搜索什么画面）</li>
+                    <li>创建缩略图概念</li>
+                </ul>
+                <p><em>AI 提供起点 - 你自己完善</em></p>
+            </div>
+
+            <div class="step-content" id="step-7">
+                <h3>📱 批量生成社交内容</h3>
+                <p>使用 AI 连接你的推文草稿库，提取：</p>
+                <ul>
+                    <li>核心主题</li>
+                    <li>内在悖论</li>
+                    <li>关键引用</li>
+                    <li>可延伸的观点</li>
+                </ul>
+                <p><em>这些都会变成未来几天的推文素材</em></p>
             </div>
         </div>
-    </div>
+    </section>
+
+    <!-- Template Preview -->
+    <section class="template-section">
+        <div class="container">
+            <h2>📋 模板预览</h2>
+            
+            <div class="template-tabs">
+                <button class="template-tab active" onclick="showTemplate('brief')">项目简报</button>
+                <button class="template-tab" onclick="showTemplate('outline')">Newsletter 大纲</button>
+                <button class="template-tab" onclick="showTemplate('video')">视频简报</button>
+            </div>
+
+            <div class="template-preview active" id="template-brief">
+                <h3>项目简报模板</h3>
+                <pre style="background: #f0f0f0; padding: 20px; border-radius: 8px; overflow-x: auto;">
+# 项目简报: [主题]
+
+## 1. 火花
+什么触发了这个 Newsletter 想法？
+- 来源: 
+- 引用/概念:
+- 为什么重要:
+
+## 2. 受众
+- 主要读者:
+- 他们当前的状态:
+- 他们期望的状态:
+- 他们最大的痛点:
+
+## 3. 争议真相
+- 主流观点:
+- 我的反主流观点:
+- 为什么我是对的:
+
+## 4. 大纲 (6部框架)
+### 引言 - 痛点
+钩子 + 个人故事或观察到的问题:
+
+### 第2部分 - 新颖视角
+独特的角度或框架:
+
+### 第3部分 - 独特机制
+具体可行的步骤:
+
+### 结论 - 核心要点
+读者应该做什么/感受到什么:
+
+## 5. 已提取的社交帖子
+### Tweet 串想法
+1. 
+2. 
+3.
+
+## 6. 需要的视频素材
+### YouTube 标题选项
+1. 
+2. 
+3.
+                </pre>
+            </div>
+
+            <div class="template-preview" id="template-outline">
+                <h3>Newsletter 大纲模板</h3>
+                <pre style="background: #f0f0f0; padding: 20px; border-radius: 8px; overflow-x: auto;">
+# Newsletter 大纲
+
+## 标题选项
+1. 
+2. 
+3. 
+
+---
+
+## 1. 受众
+**我在为谁写？**
+
+- 人口统计:
+- 心理特征:
+- 期望的转变:
+
+---
+
+## 2. 争议真相
+**我持有什么极端观点？**
+
+主流建议:
+> 
+
+我的反主流观点:
+> 
+
+为什么这很重要:
+
+---
+
+## 3. 痛点 (引言)
+**个人经历或观察到的问题**
+
+钩子 (前2句话):
+
+故事/问题:
+
+过渡到解决方案:
+
+---
+
+## 4. 新颖视角 (第2部分)
+**独特的角度或框架**
+
+关键洞察:
+
+支持论点:
+1. 
+2. 
+3. 
+
+比喻/类比:
+
+---
+
+## 5. 独特机制 (第3部分)
+**具体可行的步骤**
+
+步骤 1:
+步骤 2:
+步骤 3:
+
+要避免的常见错误:
+- 
+- 
+
+---
+
+## 6. 核心要点 (结论)
+**读者应该做什么/感受到什么？**
+
+主要收获:
+
+行动步骤:
+
+结束语 (令人难忘):
+
+---
+
+## 写作时提取的社交钩子
+
+Tweet 1:
+Tweet 2:
+Tweet 3:
+                </pre>
+            </div>
+
+            <div class="template-preview" id="template-video">
+                <h3>视频简报模板</h3>
+                <pre style="background: #f0f0f0; padding: 20px; border-radius: 8px; overflow-x: auto;">
+# 视频简报: [主题]
+
+## YouTube 标题选项 (AI生成)
+
+1. 
+2. 
+3. 
+4. 
+5. 
+
+**选定标题**: 
+
+---
+
+## 缩略图概念
+
+**视觉描述**:
+
+**文字叠加**:
+
+**颜色**:
+
+**参考风格**:
+
+---
+
+## 需要的 B-Roll 素材
+
+### 开场钩子 (0-30秒)
+- [ ] 素材: 
+- [ ] 素材: 
+
+### 主要内容 (30秒-3分钟)
+- [ ] 素材: 
+- [ ] 素材: 
+- [ ] 素材: 
+
+### 示例/证明 (3-5分钟)
+- [ ] 截图: 
+- [ ] 录屏: 
+
+### 行动号召 (最后30秒)
+- [ ] 素材: 
+
+---
+
+## 音乐/音效
+
+**背景音乐风格**:
+
+**需要的音效**:
+- [ ] 
+
+---
+
+## 剪辑笔记
+
+**节奏**: 
+
+**图形/动画**:
+
+**下三分之一字幕**:
+
+---
+
+## 最终检查清单
+
+- [ ] 前5秒有钩子
+- [ ] 30秒处有模式中断
+- [ ] 2分钟内传递价值
+- [ ] 结尾有明确的CTA
+- [ ] 添加了字幕
+- [ ] 创建了缩略图
+                </pre>
+            </div>
+        </div>
+    </section>
+
+    <!-- Calculator -->
+    <section class="calculator-section">
+        <div class="container">
+            <h2>🧮 内容产出计算器</h2>
+            
+            <div class="calc-container">
+                <div class="calc-input">
+                    <label>每周写作时间 (小时)</label>
+                    <input type="number" id="writingTime" value="2" min="1" max="20" onchange="calculate()">
+                </div>
+                
+                <div class="calc-input">
+                    <label>Newsletter 频率</label>
+                    <select id="frequency" onchange="calculate()">
+                        <option value="1">每周 1 篇</option>
+                        <option value="2">每周 2 篇</option>
+                        <option value="3">每周 3 篇</option>
+                    </select>
+                </div>
+
+                <div class="calc-result">
+                    <h3>预估产出</h3>
+                    <p id="result-text">每周可创作 20+ 条社交媒体内容</p>
+                    <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.9;">
+                        基于 Dan Koe 系统的平均转化率
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Example -->
+    <section class="example-section">
+        <div class="container">
+            <h2>📚 完整示例项目</h2>
+            
+            <div class="example-card">
+                <h3>"为什么你应该退出社交媒体"</h3>
+                <p style="margin-bottom: 20px;">一个完整的项目示例，展示了从灵感到发布的全过程。</p>
+                
+                <h4>🎯 项目简报</h4>
+                <ul style="margin-bottom: 20px;">
+                    <li><strong>火花：</strong>看到一条推文 "我删除了 Instagram，专注力提升了 10 倍"</li>
+                    <li><strong>受众：</strong>25-40 岁知识工作者，感到被通知淹没</li>
+                    <li><strong>争议真相：</strong>"社交媒体不是在连接你——它让你成为多巴胺成瘾者"</li>
+                </ul>
+
+                <h4>📊 产出结果</h4>
+                <ul>
+                    <li>✅ 1 篇完整 Newsletter (1,500 字)</li>
+                    <li>✅ 1 个 YouTube 视频脚本</li>
+                    <li>✅ 3 个 Twitter 串 (15+ 条推文)</li>
+                    <li>✅ 2 个 LinkedIn 帖子</li>
+                    <li>✅ 1 个 Instagram 轮播图</li>
+                </ul>
+
+                <p style="margin-top: 20px;">
+                    <a href="https://github.com/KevPH2026/dan-koe-content/tree/main/examples/example-project" 
+                       style="color: #667eea; text-decoration: none; font-weight: bold;">
+                        查看完整项目文件 →
+                    </a>
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <p>Dan Koe Content System | 开源内容创作工作流</p>
+            <p style="margin-top: 10px;">
+                <a href="https://github.com/KevPH2026/dan-koe-content">GitHub</a> | 
+                <a href="https://kevph2026.github.io/dan-koe-content/">Demo</a>
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Step tabs
+        function showStep(stepNum) {
+            // Hide all steps
+            document.querySelectorAll('.step-content').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.step-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected step
+            document.getElementById('step-' + stepNum).classList.add('active');
+            document.querySelectorAll('.step-tab')[stepNum - 1].classList.add('active');
+        }
+
+        // Template tabs
+        function showTemplate(templateName) {
+            document.querySelectorAll('.template-preview').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.querySelectorAll('.template-tab').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            document.getElementById('template-' + templateName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // Calculator
+        function calculate() {
+            const writingTime = parseInt(document.getElementById('writingTime').value) || 2;
+            const frequency = parseInt(document.getElementById('frequency').value) || 1;
+            
+            // Dan Koe system: 1 newsletter → 20+ social posts
+            const socialPosts = frequency * 20;
+            const videoScripts = frequency;
+            const linkedinPosts = frequency * 2;
+            
+            document.getElementById('result-text').innerHTML = `
+                每周可创作：<br>
+                <strong>${socialPosts}+</strong> 条社交媒体内容<br>
+                <strong>${videoScripts}</strong> 个视频脚本<br>
+                <strong>${linkedinPosts}</strong> 个 LinkedIn 帖子<br>
+                <br>
+                仅需 <strong>${writingTime} 小时</strong> 写作时间
+            `;
+        }
+
+        // Initialize
+        calculate();
+    </script>
 </body>
 </html>
